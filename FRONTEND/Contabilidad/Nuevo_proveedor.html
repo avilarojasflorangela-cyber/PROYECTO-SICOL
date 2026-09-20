@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo proveedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="contenedor mb-5">
+        <h1 class="text-center mb-4">Nuevo proveedor</h1>
+        <div class="tabla-contenedor">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Id proveedor</th>
+                        <th>CC/NIT</th>
+                        <th>Razón social</th>
+                        <th>Nombre del asesor </th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Ciudad</th>
+                        <th>País</th>
+                        <th>Forma de pago</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProveedores">
+                </tbody>
+            </table>
+        </div>
+        <a href="../index_contabilidad.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            fetch('http://127.0.0.1:5000/proveedores')
+            .then(response => response.json())
+            .then( data => {
+                console.log(data)
+                const tabla = document.getElementById('tablaProveedores');
+                data 
+                    .filter(proveedor => proveedor[9] === 'Pendiente')
+                    .forEach(proveedor => {
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                            <td>${String(proveedor[0]).padStart(3, '0')}</td>
+                            <td>${proveedor[1]}</td>
+                            <td>${proveedor[2]}</td>
+                            <td>${proveedor[3]}</td>
+                            <td>${proveedor[4]}</td>
+                            <td>${proveedor[5]}</td>
+                            <td>${proveedor[6]}</td>
+                            <td>${proveedor[7]}</td>
+                            <td>${proveedor[8]}</td>
+                            <td>${proveedor[9]}</td>
+                            <td>
+                                <button class="btn btn-outline-success" onclick="aprobarProveedor(${proveedor[0]})">Aprobar</button>
+                                <button class="btn btn-outline-danger" onclick="rechazarProveedor(${proveedor[0]})">Rechazar</button>
+                            </td>
+                        `;
+                        tabla.appendChild(fila);
+                    });
+            });
+        });
+        function aprobarProveedor(id) {
+            console.log("Aprobar proveedor:", id);
+
+            fetch(`http://127.0.0.1:5000/actualizar_estado_proveedor/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({estado: 'aprobado'})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.mensaje) {
+                    location.reload();
+                };
+            })
+            .catch(error => console.error('Error:',error));
+        };
+        function rechazarProveedor(id) {
+            console.log("Rechazar proveedor:", id);
+            fetch(`http://127.0.0.1:5000/actualizar_estado_proveedor/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({estado: 'rechazado'})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if(data.mensaje) {
+                    location.reload();
+                };
+            })
+            .catch(error => console.error('Error:',error));
+        };
+    </script>
+</body>
+</html>

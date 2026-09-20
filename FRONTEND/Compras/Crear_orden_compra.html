@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden de compra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Crear orden de compra</h1>
+        <div id="contenedorPedido">
+            <h3 class="mb-3">Pedidos aprobados</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Usuario</th>
+                            <th>Correo</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPedidosAprobados"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="formularioOrden" class="mt-4" style="display: none;">
+            <h3 class="mb-3">Registrar orden de compra</h3>
+            <form id="formOrdenCompra">
+                <div class="row">
+                    <div class="col">
+                        <label for="id_pedido" class="form-label">Id del pedido</label>
+                        <input type="text" class="form-control" id="id_pedido" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="id_proveedor" class="form-label">Proveedor</label>
+                        <select class="form-select" id="id_proveedor" required>
+                            <option value="">Seleccione un proveedor</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="ID_CC_NIT" class="form-label">Id / nit del proveedor</label>
+                        <input type="text" class="form-control" id="ID_CC_NIT" readonly>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="razon_social" class="form-label">Razón social</label>
+                        <input type="text" class="form-control" id="razon_social" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="correo_electronico" class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="correo_electronico" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="Usua_Nombre" class="form-label">Nombre del usuario</label>
+                        <input type="text" class="form-control" id="Usua_Nombre" readonly>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="Usua_Correo" class="form-label">Correo del usuario</label>
+                        <input type="email" class="form-control" id="Usua_Correo" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="cod_producto" class="form-label">Código del producto</label>
+                        <input type="number" class="form-control" id="cod_producto" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="nombre_producto" class="form-label">Nombre del producto</label>
+                        <input type="text" class="form-control" id="nombre_producto" readonly>
+                    </div>
+                </div>    
+                <div class="row">
+                    <div class="col">
+                        <label for="unidad_medida" class="form-label">Unidad</label>
+                        <input type="text" class="form-control" id="unidad_medida" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="cantidad" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="precio_unitario" class="form-label">Precio unitario</label>
+                        <input type="text" class="form-control" id="precio_unitario" readonly>
+                    </div>
+                </div>    
+                <div class="row">
+                    <div class="col">
+                        <label for="fecha_orden" class="form-label">Fecha de orden</label>
+                        <input type="date" class="form-control" id="fecha_orden" required>
+                    </div>
+                    <div class="col">
+                        <label for="fecha_entrega" class="form-label">Fecha de entrega</label>
+                        <input type="date" class="form-control" id="fecha_entrega" required>
+                    </div>
+                    <div class="col">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea  class="form-control" id="observaciones" rows="3"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar orden de compra</button>
+                <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+            </form>
+        </div>
+        <a id="btn-volver-tabla" href="../index_compras.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const parametros  = new URLSearchParams(window.location.search);
+            const idPedido = parametros.get('id_pedido');
+
+            document.getElementById('contenedorPedido').style.display = 'none';
+            document.getElementById('formularioOrden').style.display = 'block';
+            document.getElementById('id_pedido').value = String(idPedido).padStart(3, '0');
+            document.getElementById('fecha_orden').valueAsDate = new Date();
+
+            fetch(`http://127.0.0.1:5000/nueva_orden_compra/${idPedido}`)
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById('Usua_Nombre').value = data[6];
+                document.getElementById('Usua_Correo').value = data[7];
+                document.getElementById('cod_producto').value = data[8];
+                document.getElementById('nombre_producto').value = data[9];
+                document.getElementById('unidad_medida').value = data[11];
+                document.getElementById('cantidad').value = data[2];
+                document.getElementById('precio_unitario').value = Number(data[12]).toLocaleString('es-CO');
+            });
+
+            fetch('http://127.0.0.1:5000/proveedores')
+            .then(response => response.json())
+            .then(data => {
+                const selectProveedor = document.getElementById('id_proveedor');
+                data.forEach(proveedor => {
+                    const opcion = document.createElement('option');
+                        opcion.value = proveedor[0];
+                        opcion.textContent = proveedor[2]
+                        selectProveedor.appendChild(opcion)   
+                    });
+                    selectProveedor.addEventListener('change', function(){
+                        const idProveedor = this.value;
+                        fetch(`http://127.0.0.1:5000/proveedor/${idProveedor}`)
+                        .then(response => response.json())
+                        .then(proveedor => {
+                            document.getElementById('ID_CC_NIT').value = proveedor[1];
+                            document.getElementById('razon_social').value = proveedor[2];
+                            document.getElementById('correo_electronico').value = proveedor[4];
+                        });
+                    });
+                });
+                document.getElementById('formOrdenCompra').addEventListener('submit', function(event){
+                    event.preventDefault();
+                    const precio = document.getElementById('precio_unitario').value.replace(/\./g, '');
+                    const datos = {
+
+                        precio_unitario: Number(precio),
+                        cantidad: Number(document.getElementById('cantidad').value),
+                        fecha_orden: document.getElementById('fecha_orden').value,
+                        fecha_entrega: document.getElementById('fecha_entrega').value,
+                        observaciones: document.getElementById('observaciones').value,
+                        id_proveedor: document.getElementById('id_proveedor').value,
+                        cod_producto: document.getElementById('cod_producto').value,
+                        id_pedido: Number(idPedido)
+                    };
+                    fetch('http://127.0.0.1:5000/nueva_orden_compra',{
+                        method: 'POST',
+                        headers: {
+                            'Content-Type' : 'application/json'
+                        },
+                        body: JSON.stringify(datos)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.mensaje);
+                        window.location.href ='Consultar_ordenes_compra.html';
+                    });
+                });
+                document.getElementById('btnCancelar').addEventListener('click', function(){
+                    window.location.href = 'Pedidos.html';
+                });
+        });
+    </script>
+</body>
+</html>

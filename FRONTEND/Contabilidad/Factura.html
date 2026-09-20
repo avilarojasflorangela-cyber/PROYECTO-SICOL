@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script></head>
+<body>
+    <div id="contenedorTabla" class="contenedor mb-5">
+        <h1 class="text-center mb-4">Facturas</h1>
+        <div class="tabla-contenedor">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Id factura</th>
+                        <th>CC/NIT del proveedor</th>
+                        <th>Razón social</th>
+                        <th>Nombre del asesor</th>
+                        <th>Correo</th>
+                        <th>Radicación</th>
+                        <th>Vencimiento</th>
+                        <th>Forma de pago</th>
+                        <th>Total</th>
+                        <th>Estado de factura</th>
+                        <th>Observaciones</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaFacturas"></tbody>
+            </table>
+        </div>
+        <a href="../index_contabilidad.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            fetch('http://127.0.0.1:5000/facturas')
+            .then(response => response.json())
+            .then(data => {
+                const tabla = document.getElementById('tablaFacturas');
+                data.forEach(factura => {
+                    let botonPagar = '';
+                    if(String(factura[8]).toLowerCase() === 'pendiente de pago') {
+                        botonPagar = `
+                            <button class="btn btn-outline-primary" onclick="pagarFactura(${factura[0]}, '${factura[1]}', '${factura[2]}', ${factura[9]}, '${factura[7]}')">Pagar factura</button>
+                        `;
+                    }else{
+                        botonPagar = `
+                            <span>Pago realizado</span>
+                        `;
+                    }
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                        <td>${String(factura[0]).padStart(3, '0')}</td>
+                        <td>${factura[1]}</td>
+                        <td>${factura[2]}</td>
+                        <td>${factura[3]}</td>
+                        <td>${factura[4]}</td>
+                        <td>${new Date(factura[5]).toLocaleDateString()}</td>
+                        <td>${new Date(factura[6]).toLocaleDateString()}</td>
+                        <td>${factura[7]}</td>
+                        <td>${Number(factura[9]).toLocaleString()}</td>
+                        <td>${factura[8]}</td>
+                        <td>
+                            <input type="text" id="observacion-${factura[0]}" value="${factura[10]}" placeholder="Escribir observación">
+                            <button class="btn btn-outline-primary" onclick="guardarObservacion(${factura[0]})">Guardar</button>
+                        </td>
+                        <td>${botonPagar}</td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            });
+        })
+        function guardarObservacion(id) {
+            const observacion = document.getElementById(`observacion-${id}`).value;
+            fetch(`http://127.0.0.1:5000/actualizar_observacion_factura/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({observaciones: observacion})
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.mensaje);
+                location.reload();
+            });
+        }
+        function pagarFactura(id, CC_NIT, razon_social, total, forma_pago) {
+            Swal.fire({
+                title: 'Confirmación de pago de factura',
+                html:`
+                    <p><b>Proveedor:</b>${razon_social}</p>
+                    <p><b>CC/NIT:</b>${CC_NIT}</p>
+                    <p><b>Total:</b>${Number(total).toLocaleString()}</p>
+                    <p><b>Forma de pago:</b>${forma_pago}</p>
+                    <hr>
+                    <p>¿Está seguro de realizar el pago?</p>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar pago',
+                cancelButtonText: 'Cancelar'
+            })
+            .then((resultado)=> {
+                if(resultado.isConfirmed) {
+                    fetch(`http://127.0.0.1:5000/actualizar_estado_factura/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type' : 'application/json'
+                        },
+                        body: JSON.stringify({estado_factura:  'Pagada'})
+                    })
+                    .then(response => response.json())
+                    .then( data => {
+                        Swal.fire({
+                            title: 'Pago realizado',
+                            text: data.mensaje,
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

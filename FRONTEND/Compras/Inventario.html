@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Inventario</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Orden de compra</th>
+                        <th>Proveedor</th>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha ingreso</th>
+                        <th>Movimiento</th>
+                        <th>Stock mínimo</th>
+                        <th>Precio unitario</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaInventario">
+                </tbody>
+            </table>
+        </div>
+        <a href="../index_compras.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            fetch('http://127.0.0.1:5000/inventario')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const tabla = document.getElementById('tablaInventario');
+                data.forEach(inventario => {
+                    const fila = document.createElement('tr');
+                    const idOrden = String(inventario[1]).padStart(3, '0');
+                    const fechaIngreso = new Date(inventario[6]).toLocaleDateString('es-CO');
+                    const precio = Number(inventario[9]).toLocaleString('es-CO',{
+                        style: 'currency',
+                        currency: 'COP',
+                        minimumFractionDigits: 0
+                    });
+                    fila.innerHTML = `
+                        <td>${idOrden}</td>
+                        <td>${inventario[2]}</td>
+                        <td>${inventario[3]}</td>
+                        <td>${inventario[4]}</td>
+                        <td>${inventario[5]}</td>
+                        <td>${fechaIngreso}</td>
+                        <td>${inventario[7]}</td>
+                        <td>${inventario[8]}</td>
+                        <td>${precio}</td>
+                        <td>${inventario[10]}</td>
+                        <td>${inventario[11]}</td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            })
+            .catch(error => {
+                console.error('Error al obtener el inventario:', error);
+            });
+        });
+    </script>
+</body>
+</html>

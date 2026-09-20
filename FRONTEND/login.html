@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head> 
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <img src="Imagenes/logo.JPG" class="logo">
+                <form  method="post" id="login">
+                    <div class="mb-3">
+                        <label for="ID_CC" class="form-label">Número de cedula</label>
+                        <input type="text" class="form-control" id="ID_CC" name="ID_CC" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-outline-success">Ingresar</button>
+                </form>
+        </div>
+        <div class="login-right">
+            <img src="Imagenes/BIENVENIDO.JPG" class="img-bienvenido">
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            document.getElementById('login').addEventListener('submit', function(event){
+                event.preventDefault();
+                const ID_CCusuario= document.getElementById('ID_CC').value;
+                const passwordusuarios = document.getElementById('password').value;
+                fetch('http://127.0.0.1:5000/login', {
+                    method:'POST',
+                    headers:{
+                        'Content-Type': 'application/json'
+                    },
+                    body:JSON.stringify({ID_CC: ID_CCusuario, password: passwordusuarios})
+                })
+                .then(response => {
+                    if(!response.ok){
+                        return response.json().then(data => {
+                            Swal.fire({
+                                title: "Error",
+                                text: data.mensaje,
+                                icon: "error",
+                                confirmButtonText: "Intentar de nuevo"
+                            });
+                        });
+                    }
+                    return response.json().then(data => {
+
+                        localStorage.setItem('usuario', JSON.stringify(data));
+
+                        console.log(data);
+                        console.log('Área recibida:', data.area);
+                    
+                        if (data.area == 'admin'){
+                            window.location.href = 'index_administrador.html';
+                        }else if (data.area == 'logistica'){
+                            window.location.href = 'index_logistica.html';
+                        }else if (data.area == 'contabilidad'){
+                            window.location.href = 'index_contabilidad.html';
+                        }else if (data.area == 'proveedor'){
+                            window.location.href = 'index_proveedores.html';
+                        }else if (data.area == 'compras'){
+                            window.location.href = 'index_compras.html';
+                        }else if (data.area == 'cliente'){
+                            window.location.href = 'index_cliente.html';
+                        }else{
+                            Swal.fire({
+                                title: "Área no válida",
+                                text: "El área del usuario no es válida",
+                                icon: "warning",
+                                confirmButtonText: "Aceptar"
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

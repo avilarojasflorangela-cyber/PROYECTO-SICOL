@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos del proveedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="contenedor mb-5">
+        <h1 class="text-center mb-4">Documentos del proveedor</h1>
+        <div class="contenedor">
+            <form id="formDocumento">
+                <div class="row">
+                    <div class="col">
+                        <label for="tipo_documento" class="form-label">Tipo de Documento</label>
+                        <select id="tipo_documento" class="form-control" required>
+                            <option value="">Seleccione un documento</option>
+                            <option value="Cedula">Cédula</option>
+                            <option value="Camara de comercio">Cámara de comercio</option>
+                            <option value="Rut">Rut</option>
+                            <option value="Certificado">Certificado</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="archivo" class="form-label">Seleccione el archivo</label>
+                        <input type="file" id="archivo" class="form-control" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Subir documento</button>
+            </form>
+        </div>
+        <hr class="my-5">
+        <h2 class="text-center mb-4">Mis documentos</h2>
+        <div class="tabla-contenedor">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Tipo de documento</th>
+                        <th>Nombre del archivo</th>
+                        <th>Fecha de subida</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaDocumentos"></tbody>
+            </table>
+        </div>
+        <a href="../index_proveedores.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+    
+    <script>
+        document.getElementById('formDocumento').addEventListener('submit', function(event){
+            event.preventDefault();
+            const tipo_documento = document.getElementById('tipo_documento').value;
+            const archivo = document.getElementById('archivo').files[0];
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+            fetch('http://127.0.0.1:5000/proveedores')
+            .then(response => response.json())
+            .then(data => {
+                const proveedor = data.find(
+                    proveedor => proveedor[10] == usuario.id
+                );
+                const formulario = new FormData();
+                formulario.append('tipo_documento', tipo_documento);
+                formulario.append('archivo', archivo);
+                formulario.append('id_proveedor', proveedor[0]);
+
+                return fetch('http://127.0.0.1:5000/nuevo_documento_proveedor', {
+                    method:'POST',
+                    body: formulario
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                alert(data.mensaje);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+        fetch('http://127.0.0.1:5000/documentos_proveedor')
+        .then(response => response.json())
+        .then(data => {
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+            fetch('http://127.0.0.1:5000/proveedores')
+            .then(response => response.json())
+            .then(proveedores => {
+                const proveedor = proveedores.find(
+                    proveedor => proveedor[10] == usuario.id
+                );
+                const documentos = data.filter(
+                    documento => documento[6] == proveedor[0]
+                );
+                const tabla = document.getElementById('tablaDocumentos');
+                documentos.forEach(documento => {
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                        <td>${documento[1]}</td>
+                        <td>${documento[2]}</td>
+                        <td>${new Date(documento[4]).toLocaleDateString()}</td>                       
+                        <td>${documento[5]}</td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

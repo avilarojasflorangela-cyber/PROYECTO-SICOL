@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar estado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../style.css">    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body  class="pagina-consultar-estado">
+    <div class="contenedor-consultar-estado">
+        <div class="encabezado-modulo">
+            <h1>Consultar estado del pedido</h1>
+            <p>Consulta la información y el estado actual de tu pedido</p>
+        </div>
+        <div class="buscador-pedido">
+            <label for="numero_pedido" class="form-label">Número del pedido</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="numero_pedido" placeholder="Ejemplo: 003">
+                <button type="button" class="btn btn-buscar" id="btnBuscar"><i class="bi bi-search"></i> Buscar</button>
+            </div>
+        </div>
+        <div class="tabla-consultar">
+            <table id="consultar_estado-table" class="table" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Número del pedido</th>
+                    <th>Nombre del usuario</th>
+                    <th>Número de orden de compra</th>
+                    <th>Proveedor</th>
+                    <th>Código del producto</th>
+                    <th>Producto</th>
+                    <th>Factura</th>
+                    <th>Estado de factura</th>
+                    <th>Estado del pedido</th>
+                </tr>
+            </thead>
+            <tbody id="Consultar_estado-body"></tbody>
+        </table>
+        </div>
+        <div class="botones-consultar">
+            <a href="Consultar_estado.html" class="btn btn-consultar-estado"><i class="bi bi-arrow-clockwise"></i> Consultar estado</a>
+            <button type="button" id="btnVolver" class="btn btn-volver"><i class="bi bi-arrow-left"></i> Volver</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const btnBuscar = document.getElementById('btnBuscar');
+            const numeroPedido = document.getElementById('numero_pedido');
+            const cuerpoTabla = document.getElementById('Consultar_estado-body');
+            const tabla = document.getElementById('consultar_estado-table')
+            const btnVolver = document.getElementById('btnVolver');
+
+            btnVolver.addEventListener('click', function(){
+                const parametros = new URLSearchParams(window.location.search);
+                const origen = parametros.get('origen');
+
+                if(origen === 'logistica'){
+                    window.location.href = '../index_logistica.html';
+                }else if(origen === 'cliente'){
+                    window.location.href = '../index_cliente.html';
+                }else if(origen === 'compras'){
+                    window.location.href = '../index_compras.html';
+                }else if(origen === 'contabilidad'){
+                    window.location.href = '../index_contabilidad.html';
+                }else if(origen === 'admin'){
+                    window.location.href = '../index_administrador.html'
+                }
+            });
+            btnBuscar.addEventListener('click', function(){
+                const numero = numeroPedido.value.trim();
+                if (numero === ''){
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Número requerido',
+                        text: 'Por favor, ingrese el número del pedido.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    return;
+                }
+                const idPedido = parseInt(numero, 10);
+                if (isNaN (idPedido)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Número no válido',
+                        text: 'El número del pedido debe ser un número..',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    return;
+                }
+                fetch(`http://127.0.0.1:5000/consultar_estado/${idPedido}`)
+                .then(response => {
+                    if(!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Error al consultar el pedido.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const pedido = String(data[0]).padStart(3, '0');
+                    const usuario = data[1];
+                    const estadoPedido = data[2] ? data[2] : '-';
+                    const orden = data[3] ? String(data[3]).padStart(3, '0') : '-';
+                    const proveedor = data[4] ? data[4] : '-';
+                    const codigoProducto = data[5] ? data[5] : '-';
+                    const producto= data[6] ? data[6] : '-';
+                    const factura = data[7] ? String(data[7]).padStart(3, '0') : '-';
+                    const estadoFactura = data[8] ? data[8] : '-';
+
+                    tabla.style.display = 'table';
+
+                    cuerpoTabla.innerHTML = `
+                        <tr>
+                            <td>${pedido}</td>
+                            <td>${usuario}</td>
+                            <td>${orden}</td>
+                            <td>${proveedor}</td>
+                            <td>${codigoProducto}</td>
+                            <td>${producto}</td>
+                            <td>${factura}</td>
+                            <td>${estadoFactura}</td>
+                            <td>${estadoPedido}</td>
+                        </tr>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'No se pudo consultar el estado del pedido.',
+                        confirmButtonText: 'Aceptar'
+                    });                
+                });
+            });
+        });
+    </script>
+</body>
+</html>

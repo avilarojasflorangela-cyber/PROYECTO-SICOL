@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../style.css">    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body >
+    <div class="contenedor-crear-codigo">
+        <div class="encabezado-modulo">
+            <h1 id="titulo-modulo">Productos registrados</h1>
+            <p>Gestiona los productos registrados en el sistema</p>
+        </div>
+        <div class="barra-acciones">        
+            <button id="btn-crear-producto" class="btn btn-crear"><i class="bi bi-plus-circle"></i> Crear producto</button>        
+        <div class="tabla-productos">
+            <table id="producto-table" class="table">            
+                <thead>
+                    <tr>
+                        <th>Código del producto</th>
+                        <th>Nombre del producto</th>
+                        <th>Descripción</th>
+                        <th>Unidad de medida</th>
+                        <th>Precio unitario</th>
+                        <th>Estado</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+            <tbody id="productos-body">
+            </tbody>
+        </table>
+        </div>
+        <div class="botones-productos">
+            <a id="btn-volver-tabla" href="../index_logistica.html" class="btn btn-volver"><i class="bi bi-arrow-left"></i> Volver</a>
+        </div>
+
+    <div id="formulario-crear" class="formulario-producto" style="display: none;">
+        <div class="encabezado-formulario">
+            <h2>Crear nuevo producto</h2>
+            <p>Ingrese la información del producto</p>
+        </div>        
+        <form id="crear-producto-form">
+            <div class="row">
+                <div class="col">
+                    <label for="cod_producto" class="form-label">Código del producto</label>
+                    <input type="number" class="form-control" id="cod_producto" placeholder = "Ingrese el código del producto" required>
+                </div>
+                <div class="col">
+                    <label for="nombre_producto" class="form-label">Nombre del producto</label>
+                    <input type="text" class="form-control" id="nombre_producto" placeholder = "Ingrese el nombre del producto" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="descripcion" placeholder="Ingrese la descripción del producto" required>
+                </div>
+                <div class="col">
+                    <label for="unidad_medida" class="form-label">Unidad de medida</label>
+                    <input type="text" class="form-control" id="unidad_medida" placeholder = "Ejmplo: unidad, caja, kg" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="precio_unitario" class="form-label">Precio unitario</label>
+                    <input type="text" class="form-control" id="precio_unitario" placeholder = "Ingrese el precio unitario" required>
+                </div>
+                <div class="col">
+                    <label for="estado_producto" class="form-label">Estado del producto</label>
+                    <input type="text" class="form-control" id="estado_producto" readonly>
+                </div>
+                <div class="col">
+                    <label for="categoria" class="form-label">Categoría</label>
+                    <input type="text" class="form-control" id="categoria" placeholder = "Ingrese la categoria" required>
+                </div>
+                <div class="col">
+                    <label for="marca" class="form-label">Marca</label>
+                    <input type="text" class="form-control" id="marca" placeholder = "Ingrese la marca" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Crear producto</button>
+            <button type="button"  id="btn-volver-crear" class="btn btn-outline-primary">Volver</button>
+        </form>
+    </div>
+
+    <div id="formulario-editar"  class="formulario-producto" style="display: none;">
+        <div class="encabezado-formulario">
+            <h2>Editar producto</h2>
+            <p>Modifique la información del producto</p>
+        </div>        
+        <form id="editar-producto-form">
+            <div class="row">
+                <div class="col">
+                    <label for="editar_cod_producto" class="form-label">Código del producto</label>
+                    <input type="number" class="form-control" id="editar_cod_producto" required>
+                </div>
+                <div class="col">
+                    <label for="editar_nombre_producto" class="form-label">Nombre del producto</label>
+                    <input type="text" class="form-control" id="editar_nombre_producto" required>                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar_descripcion" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="editar_descripcion"required>
+                </div>
+                <div class="col">
+                    <label for="editar_unidad_medida" class="form-label">Unidad de medida</label>
+                    <input type="text" class="form-control" id="editar_unidad_medida" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar_precio_unitario" class="form-label">Precio unitario</label>
+                    <input type="text" class="form-control" id="editar_precio_unitario" required>
+                </div>
+                <div class="col">
+                    <label for="editar_estado_producto" class="form-label">Estado del producto</label>
+                    <select class="form-select" id="editar_estado_producto" required>
+                        <option value="Activo">Activo</option>
+                        <option value="Desactivo">Desactivo</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="editar_categoria" class="form-label">Categoría</label>
+                    <input type="text" class="form-control" id="editar_categoria" required>
+                </div>
+                <div class="col">
+                    <label for="editar_marca" class="form-label">Marca</label>
+                    <input type="text" class="form-control" id="editar_marca"  required>
+                </div>
+            </div>                
+            <div class="botones-formulario">
+                <button type="submit" class="btn btn-editar"><i class="bi bi-pencil-square"></i> Editar producto</button>
+                <button type="button" id="btn-volver-editar" class="btn btn-volver"><i class="bi bi-arrow-left"></i>Volver</button>
+                </div>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+
+            const tabla = document.getElementById('producto-table');
+            const formularioCrear = document.getElementById('formulario-crear');
+            const formularioEditar = document.getElementById('formulario-editar');
+
+            const btnCrearProducto = document.getElementById('btn-crear-producto');
+            const btnVolverCrear = document.getElementById('btn-volver-crear');
+            const btnVolverEditar = document.getElementById('btn-volver-editar');
+
+            btnCrearProducto.addEventListener('click', function(){
+                tabla.style.display = 'none';
+                btnCrearProducto.style.display = 'none';
+                formularioCrear.style.display = 'block';                   
+                formularioEditar.style.display = 'none';
+            });
+
+            btnVolverCrear.addEventListener('click', function(){
+                formularioCrear.style.display = 'none';
+                tabla.style.display = 'table';
+                btnCrearProducto.style.display = 'inline-block';
+            });
+
+            btnVolverEditar.addEventListener('click', function(){
+                formularioEditar.style.display = 'none';
+                tabla.style.display = 'table';
+                btnCrearProducto.style.display = 'inline-block';
+            });
+                
+            function cargarProductos(){
+                fetch('http://127.0.0.1:5000/detalle_productos')
+                    .then(response => response.json())
+                    .then (data => {
+                        const cuerpoTabla = document.getElementById('productos-body');
+                        cuerpoTabla.innerHTML ='';
+                        data.forEach(producto => {
+                        const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${String(producto[1]).padStart(3, '0')}</td>
+                                <td>${producto[2]}</td>
+                                <td>${producto[3]}</td>
+                                <td>${producto[4]}</td>
+                                <td>${Number(producto[5]).toLocaleString('es-CO')}</td>
+                                <td>${producto[6]}</td>
+                                <td>${producto[7]}</td>
+                                <td>${producto[8]}</td>
+                                <td>
+                                    <button class="btn btn-outline-success" onclick="editarProducto(${producto[0]})">Editar</button>
+                                    ${producto[6] === 'Activo' ? `<button class = "btn btn-outline-danger" onclick = "desactivarProducto(${producto[0]})">Desactivar</button>` : ''}
+                                </td>
+                            `;
+                            cuerpoTabla.appendChild(tr)
+                        });
+                    })
+                    .catch(error => console.error ('Error:', error));
+            }
+            cargarProductos();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+
+            const tabla = document.getElementById('producto-table');
+            const formularioCrear = document.getElementById('formulario-crear');
+            const formularioEditar = document.getElementById('formulario-editar');
+            const tituloModulo = document.getElementById('titulo-modulo');
+            const botonVolverTabla = document.getElementById('btn-volver-tabla');
+
+            const btnCrearProducto = document.getElementById('btn-crear-producto');
+
+            const formularioCrearProducto = document.getElementById('crear-producto-form');
+            const estadoProducto = document.getElementById('estado_producto');
+
+            btnCrearProducto.addEventListener('click', function(){
+                tabla.style.display = 'none';
+                btnCrearProducto.style.display = 'none';
+                formularioCrear.style.display = 'block';
+                formularioEditar.style.display = 'none';
+                tituloModulo.style.display = 'none';
+                botonVolverTabla.style.display = 'none';
+
+                estadoProducto.value = 'Activo';
+            });
+            formularioCrearProducto.addEventListener('submit', function(event){
+                event.preventDefault();
+
+                const cod_producto = document.getElementById('cod_producto').value;
+                const nombre_producto = document.getElementById('nombre_producto').value;
+                const descripcion = document.getElementById('descripcion').value;
+                const unidad_medida = document.getElementById('unidad_medida').value;
+                const precio_unitario = document.getElementById('precio_unitario').value.replace(/\./g, '');
+                const estado_producto= document.getElementById('estado_producto').value;
+                const categoria = document.getElementById('categoria').value;
+                const marca = document.getElementById('marca').value;
+
+                fetch('http://127.0.0.1:5000/nuevo_detalle_producto',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({cod_producto: cod_producto, nombre_producto: nombre_producto, descripcion: descripcion, unidad_medida: unidad_medida, precio_unitario: precio_unitario, estado_producto: estado_producto, categoria: categoria, marca: marca})    
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensaje)
+                    window.location.href = 'Crear_codigo.html'
+                })
+                .catch(error => console.error ('Error:', error))
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            let idProductoEditar;
+            window.editarProducto = function(id){
+                idProductoEditar = id;
+
+                const tabla = document.getElementById('producto-table');
+                const formularioCrear = document.getElementById('formulario-crear');
+                const formularioEditar = document.getElementById('formulario-editar');
+                const tituloModulo = document.getElementById('titulo-modulo');
+                const botonVolverTabla = document.getElementById('btn-volver-tabla');
+                const btnCrearProducto = document.getElementById('btn-crear-producto');
+
+                tabla.style.display = 'none';
+                btnCrearProducto.style.display = 'none';
+                formularioCrear.style.display = 'none';
+                formularioEditar.style.display = 'block';
+                tituloModulo.style.display = 'none';
+                botonVolverTabla.style.display = 'none';
+
+                fetch(`http://127.0.0.1:5000/detalle_producto/${id}`) 
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('editar_cod_producto').value = data[1];
+                        document.getElementById('editar_nombre_producto').value = data[2];
+                        document.getElementById('editar_descripcion').value = data[3];
+                        document.getElementById('editar_unidad_medida').value = data[4];
+                        document.getElementById('editar_precio_unitario').value = Number(data[5]).toLocaleString('es-CO');
+                        document.getElementById('editar_estado_producto').value = data[6];
+                        document.getElementById('editar_categoria').value = data[7];
+                        document.getElementById('editar_marca').value = data[8];
+                    })
+                    .catch(error => console.error ('Error:',error));            
+            }
+            document.getElementById('editar-producto-form').addEventListener('submit', function(event){
+                event.preventDefault();
+                const cod_producto= document.getElementById('editar_cod_producto').value;
+                const nombre_producto= document.getElementById('editar_nombre_producto').value;
+                const descripcion= document.getElementById('editar_descripcion').value;
+                const unidad_medida= document.getElementById('editar_unidad_medida').value;
+                const precio_unitario= document.getElementById('editar_precio_unitario').value.replace(/\./g, '');
+                const estado_producto = document.getElementById('editar_estado_producto').value;
+                const categoria = document.getElementById('editar_categoria').value;
+                const marca = document.getElementById('editar_marca').value;
+
+                fetch(`http://127.0.0.1:5000/actualizar_detalle_producto/${idProductoEditar}`,{
+                    method : 'PUT',
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    body : JSON.stringify({cod_producto, nombre_producto, descripcion, unidad_medida, precio_unitario, estado_producto,categoria, marca})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensaje);
+                    window.location.href = 'Crear_codigo.html'
+                })
+                .catch(error => console.error ('Error:',error));
+            });
+        });
+    </script>
+
+    <script>
+        function desactivarProducto(id){
+            fetch(`http://127.0.0.1:5000/desactivar_detalle_producto/${id}`,{
+                method: 'PUT'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.mensaje);
+                window.location.href = 'Crear_codigo.html';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+    </script>
+</body>
+</html>

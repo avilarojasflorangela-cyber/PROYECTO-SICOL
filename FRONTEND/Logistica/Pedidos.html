@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Pedidos</h2>
+        <hr>
+        <table id="pedidos-table" class="table table-bordered border-dark table-secondary">
+            <thead>
+                <tr>
+                    <th>Número del pedido</th>
+                    <th>Usuario</th>
+                    <th>Fecha de creación</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Destino</th>
+                    <th>Fecha requerida</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="pedidos-body">
+            </tbody>
+        </table>
+        <a href="../index_logistica.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const cuerpoTabla = document.getElementById('pedidos-body');
+            fetch('http://127.0.0.1:5000/pedidos_logistica')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(function(pedido){
+                    const fila = document.createElement('tr');
+                    const numeroPedido = String(pedido[0]).padStart(3, '0');
+                    const usuario = pedido[1] + ' ' + pedido[2];
+                    let estadoActual = pedido[8];
+
+                    const fechaCreacion = new Date(pedido[3]).toLocaleDateString('es-CO');
+                    const fechaRequerida = new Date(pedido[7]).toLocaleDateString('es-CO');
+
+                    fila.innerHTML = `
+                        <td>${numeroPedido}</td>
+                        <td>${usuario}</td>
+                        <td>${fechaCreacion}</td>
+                        <td>${pedido[4]}</td>
+                        <td>${pedido[5]}</td>
+                        <td>${pedido[6]}</td>
+                        <td>${fechaRequerida}</td>
+                        <td class="estado-pedido">${estadoActual}</td>      
+                        <td>
+                            <button type="button" class="btn btn-outline-primary btn-cambiar-estado">Cambiar estado</button>         
+                        </td>
+                    `;
+                    cuerpoTabla.appendChild(fila);
+                    function activarBotonCambiar(){
+                        const botonCambiar = fila.querySelector('.btn-cambiar-estado');
+                        botonCambiar.addEventListener('click', function(){
+                            const celdaAccion = botonCambiar.parentElement;
+                            celdaAccion.innerHTML =  ` 
+                                <select class="form-select estado-select">
+                                    <option value="Pendiente" ${estadoActual === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                    <option value="Aprobado" ${estadoActual === 'Aprobado' ? 'selected' : ''}>Aprobado</option>
+                                    <option value="Rechazado" ${estadoActual === 'Rechazado' ? 'selected' : ''}>Rechazado</option>
+                                    <option value="Revisión" ${estadoActual === 'Revisión' ? 'selected' : ''}>Revisión</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-success btn-guardar-estado mt-2">Guardar</button>
+                                <button type="button" class="btn btn-outline-secondary btn-cancelar-estado mt-2">Cancelar</button>
+                            `;
+                            const botonGuardar = celdaAccion.querySelector('.btn-guardar-estado');
+                            botonGuardar.addEventListener('click', function(){
+                                const nuevoEstado = celdaAccion.querySelector('.estado-select').value;
+                                fetch(`http://127.0.0.1:5000/cambiar_estado/${pedido[0]}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        estado: nuevoEstado
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.error){
+                                        alert(data.error);
+                                        return;
+                                    }
+                                    alert(data.mensaje);
+                                    estadoActual = nuevoEstado;
+                                    fila.querySelector('.estado-pedido').textContent = nuevoEstado;
+                                    celdaAccion.innerHTML = `
+                                        <button type="button" class="btn btn-outline-primary btn-cambiar-estado">Cambiar estado</button>
+                                    `; 
+                                    activarBotonCambiar();
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('No se pudo actualizar el estado.');
+                                });
+                            });
+                            const botonCancelar =celdaAccion.querySelector('.btn-cancelar-estado');
+                            botonCancelar.addEventListener('click', function(){
+                                celdaAccion.innerHTML = `
+                                    <button type="button" class="btn btn-outline-primary btn-cambiar-estado">Cambiar estado</button>
+                                `;
+                                activarBotonCambiar();
+                            });
+                        })
+                    }
+                    activarBotonCambiar();
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error)
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina principal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"><body class="pagina-administrador">
+</head>
+<body class="pagina-administrador">
+    <header class="encabezado">
+        <div class="usuario">
+            Bienvenido,<span id="nombreUsuario"></span>
+        </div>
+        <img src="Imagenes/logo.JPG" class="logo-principal">
+    </header>
+    <div class="bienvenida">
+        <h1>Bienvenido, administrador</h1>
+        <p>Desde este panel podrás administrar los diferentes módulos del sistema</p>
+    </div>
+    <nav class="menu">
+    <a href="Administrador/Usuarios.html" class="btn btn-usuarios"><i class="bi bi-people"></i> Usuarios</a>
+    <a href="index_cliente.html" class="btn btn-cliente"><i class="bi bi-person"></i> Cliente</a>
+    <a href="index_logistica.html" class="btn btn-logistica"><i class="bi bi-truck"></i> Logistica</a>
+    <a href="index_compras.html" class="btn btn-compras"><i class="bi bi-cart"></i>Compras</a>
+    <a href="index_contabilidad.html" class="btn btn-contabilidad"><i class="bi bi-cash-coin"></i> Contabilidad</a>
+    <a href="index_proveedores.html" class="btn btn-proveedores"><i class="bi bi-building"></i> Proveedor</a>
+    </nav>
+    <button class="btn btn-cerrar-sesion" onclick="cerrarSesion()"><i class="bi bi-box-arrow-in-right"></i> Cerrar sesión</button>
+
+    <script>
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        if(usuario){
+            document.getElementById('nombreUsuario').textContent =
+                usuario.nombre + ' ' + usuario.apellido;
+        }
+        function cerrarSesion(){
+            Swal.fire({
+                title: "¿Cerrar sesión?",
+                text: "Se cerrará la sesión actual.",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#198754",
+                confirmButtonText: "Sí, cerrar sesión",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if(result.isConfirmed){
+                    localStorage.removeItem('usuario');
+                    Swal.fire({
+                        title: "Sesión cerrada",
+                        text: "Hasta pronto.",
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    setTimeout(function(){
+                        window.location.href = "login.html";
+                    },1500);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrada de material</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Entrada de Material</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Orden de compra</th>
+                        <th>Cantidad ordenada</th>
+                        <th>Cantidad recibida</th>
+                        <th>Cantidad pendiente</th>
+                        <th>Proveedor</th>
+                        <th>Pedido</th>
+                        <th>Producto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEntradaMaterial">
+                </tbody>
+            </table>
+        </div>
+        <a href="../index_compras.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            fetch('http://127.0.0.1:5000/entrada_material')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const tabla = document.getElementById('tablaEntradaMaterial');
+                data.forEach(entrada => {
+                    const fila = document.createElement('tr');
+                    const idOrden = String(entrada[0]).padStart(3, '0');
+                    const idPedido = String(entrada[3]).padStart(3, '0');
+                    const cantidadOrdenada = entrada[1];
+                    const cantidadRecibida = parseInt(entrada[6]);
+                    const cantidadPendiente = cantidadOrdenada - cantidadRecibida;
+                    let estado = "";
+                    if (cantidadRecibida == 0) {
+                        estado = "Pendiente";
+                    }else if (cantidadRecibida < cantidadOrdenada) {
+                        estado = "Parcial";
+                    }else{
+                        estado = "Cumplida";
+                    }
+
+                    fila.innerHTML = `
+                        <td>${idOrden}</td>
+                        <td>${cantidadOrdenada}</td>
+                        <td>${cantidadRecibida}</td>
+                        <td>${cantidadPendiente}</td>
+                        <td>${entrada[2]}</td>
+                        <td>${idPedido}</td>
+                        <td>${entrada[5]}</td>
+                        <td>${estado}</td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

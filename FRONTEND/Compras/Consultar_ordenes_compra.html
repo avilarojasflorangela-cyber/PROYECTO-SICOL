@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar órdenes de compra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-4" id="contenedor-consulta">
+        <h1 class="text-center mb-4">Órdenes de compra</h1>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Orden de compra</th>
+                        <th>Pedido</th>
+                        <th>Proveedor</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio unitario</th>
+                        <th>Fecha de orden</th>
+                        <th>Fecha de entrega</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaOrdenesCompra"></tbody>
+            </table>
+        </div>
+        <a href="../index_compras.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+
+    <div id="formulario-editar" style="display: none;">
+        <h2>Editar orden de compra</h2>
+        <form id ="editar-orden-form">
+            <div class="row">
+                <div class="col">
+                    <label for="editar_id_orden" class="form-label">Id de orden de compra</label>
+                    <input type="text" class="form-control" id="editar_id_orden" readonly>
+                </div>
+                <div class="col">
+                    <label for="editar_id_pedido" class="form-label">Id de pedido</label>
+                    <input type="text" class="form-control" id="editar_id_pedido" readonly>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar_cantidad" class="form-label">Cantidad</label>
+                    <input type="text" class="form-control" id="editar_cantidad" readonly>
+                </div>
+                <div class="col">
+                    <label for="editar_precio_unitario" class="form-label">Precio</label>
+                    <input type="text" class="form-control" id="editar_precio_unitario" readonly>
+                </div>
+                <div class="col">
+                    <label for="editar_fecha_orden" class="form-label">Fecha de orden</label>
+                    <input type="date" class="form-control" id="editar_fecha_orden" readonly>
+                </div>
+                <div class="col">
+                    <label for="editar_fecha_entrega" class="form-label">Fecha de entrega</label>
+                    <input type="date" class="form-control" id="editar_fecha_entrega" readonly>
+                </div>           
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar_id_proveedor" class="form-label">Proveedor</label>
+                    <select class="form-select" id="editar_id_proveedor" required>
+                        <option value="">Seleccione un proveedor</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="editar_ID_CC_NIT" class="form-label">Id / nit del proveedor</label>
+                    <input type="text" class="form-control" id="editar_ID_CC_NIT" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar_razon_social" class="form-label">Razón social</label>
+                    <input type="text" class="form-control" id="editar_razon_social" required>
+                </div>
+                <div class="col">
+                    <label for="editar_correo_electronico" class="form-label">Correo</label>
+                    <input type="email" class="form-control" id="editar_correo_electronico" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar_observaciones" class="form-label">Observaciones</label>
+                    <textarea class="form-control" id="editar_observaciones"  required></textarea>
+                </div>                
+                <div class="col">
+                    <label for="editar_estado_orden" class="form-label">Estado de orden</label>   
+                    <select class="form-select" id="editar_estado_orden" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Entregado">Entregado</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-warning">Guardar</button>
+            <button type="button" id="btn-volver-editar" class="btn btn-outline-success">Volver</button>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+
+            const tabla = document.getElementById('tablaOrdenesCompra')
+            const formularioEditar = document.getElementById('formulario-editar');
+            const btnVolverEditar = document.getElementById('btn-volver-editar');
+            tabla.style.display = 'table-row-group';
+
+                fetch('http://127.0.0.1:5000/orden_compras')
+                .then(response => response.json())
+                .then(data => {
+                    const tabla = document.getElementById('tablaOrdenesCompra');
+                    data.forEach(orden => {
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                            <td>${String(orden[0]).padStart(3, '0')}</td>
+                            <td>${String(orden[1]).padStart(3, '0')}</td>
+                            <td>${orden[2]}</td>
+                            <td>${orden[3]}</td>
+                            <td>${orden[4]}</td>
+                            <td>${Number(orden[5]).toLocaleString('es-CO')}</td>
+                            <td>${new Date(orden[6]).toLocaleDateString()}</td>
+                            <td>${new Date(orden[7]).toLocaleDateString()}</td>
+                            <td>${orden[8]}</td>
+                            <td><button class="btn btn-outline-primary btnEditar" onclick="editarOrden(${orden[0]})">Editar</button></td>
+                        `;
+                        tabla.appendChild(fila);
+                    });            
+                });
+        })
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const formularioEditar = document.getElementById('formulario-editar');
+                const contenedorConsulta = document.getElementById('contenedor-consulta');
+                const btnVolverEditar = document.getElementById('btn-volver-editar');
+
+                let idOrdenEditar;
+                let idProveedoresEditar;
+                let codProductoEditar;
+                let idPedidoEditar;
+
+            window.editarOrden = function(id){
+
+                idOrdenEditar = id;
+                contenedorConsulta.style.display = 'none';
+                formularioEditar.style.display = 'block';
+
+                fetch(`http://127.0.0.1:5000/orden_compra/${id}`) 
+                    .then(response => response.json())
+                    .then(data => {
+
+                        idProveedoresEditar = data[8];
+                        codProductoEditar = data[9];
+                        idPedidoEditar = data[10];
+
+                        document.getElementById('editar_id_orden').value = String(data[0]).padStart(3, '0');
+                        document.getElementById('editar_id_pedido').value = String(data[10]).padStart(3, '0');
+                        document.getElementById('editar_precio_unitario').value =  Number(data[1]).toLocaleString('es-CO');
+                        document.getElementById('editar_cantidad').value = data[2];
+                        document.getElementById('editar_fecha_orden').value = new Date(data[3]).toISOString().split('T')[0];
+                        document.getElementById('editar_fecha_entrega').value = new Date(data[4]).toISOString().split('T')[0];
+                        document.getElementById('editar_estado_orden').value = data[6];
+                        document.getElementById('editar_observaciones').value = data[7];
+
+                        fetch('http://127.0.0.1:5000/proveedores')
+                        .then(response => response.json())
+                        .then(proveedores => {
+
+                            const selectProveedor = document.getElementById('editar_id_proveedor');
+                            proveedores.forEach(proveedor => {
+                                const opcion = document.createElement('option');
+                                opcion.value = proveedor[0];
+                                opcion.textContent = proveedor[2];                               
+                                selectProveedor.appendChild(opcion);
+                            });
+                            selectProveedor.value = data[8];
+                            proveedores.forEach(proveedor => {
+                                if(proveedor[0] == data[8]) {
+                                    document.getElementById('editar_ID_CC_NIT').value = proveedor[1];
+                                    document.getElementById('editar_razon_social').value = proveedor[2];
+                                    document.getElementById('editar_correo_electronico').value = proveedor[4];
+                                }
+                            });
+                            selectProveedor.addEventListener('change', function(){
+                                const idProveedor = selectProveedor.value;
+                                proveedores.forEach(proveedor => {
+                                    if(proveedor[0] == idProveedor) {
+                                        document.getElementById('editar_ID_CC_NIT').value = proveedor[1];
+                                        document.getElementById('editar_razon_social').value = proveedor[2];
+                                        document.getElementById('editar_correo_electronico').value = proveedor[4];
+                                        idProveedoresEditar = proveedor[0];
+                                    }
+                                });
+                            });
+                        });                        
+                    })
+                    .catch(error => console.error ('Error:',error));            
+            }
+            btnVolverEditar.addEventListener('click', function() {
+                formularioEditar.style.display = 'none';
+                contenedorConsulta.style.display = 'block';
+            });           
+            document.getElementById('editar-orden-form').addEventListener('submit', function(event){
+                event.preventDefault();
+
+                const cantidad= document.getElementById('editar_cantidad').value
+                const precio_unitario = document.getElementById('editar_precio_unitario').value.replace(/\./g, '');
+                const fecha_orden = document.getElementById('editar_fecha_orden').value;
+                const fecha_entrega = document.getElementById('editar_fecha_entrega').value;
+                const estado_orden = document.getElementById('editar_estado_orden').value;
+                const observaciones = document.getElementById('editar_observaciones').value;
+
+                fetch(`http://127.0.0.1:5000/actualizar_orden_compra/${idOrdenEditar}`,{
+                    method : 'PUT',
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    body : JSON.stringify({precio_unitario, cantidad, fecha_orden, fecha_entrega, estado_orden, observaciones, id_proveedor: idProveedoresEditar, cod_producto: codProductoEditar, id_pedido: idPedidoEditar})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.mensaje);
+                    window.location.href = 'Consultar_ordenes_compra.html'
+                })
+                .catch(error => console.error ('Error:',error));
+            });
+        });
+    </script>
+</body>
+</html>

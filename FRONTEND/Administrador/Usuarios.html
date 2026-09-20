@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">   
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="pagina-usuarios">
+    <div class="container mt-5 usuarios-contenido">
+        <h2 id="titulo-modulo">Módulo de usuarios</h2>
+        <button id="btn-crear-usuario" class="btn-crear-usuario"><i class="bi bi-person-plus"></i> Crear nuevo usuario</button>
+        <table id="usuarios-table" class="table table-bordered table-secondary">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Cedula</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Ciudad</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Estado</th>
+                    <th>Área</th>
+                    <th>contraseña</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody id="usuarios-body">
+            </tbody>
+        </table>
+        <a id="btn-volver-tabla" href="../index_administrador.html" class="btn btn-volver"><i class="bi bi-arrow-left"></i> Volver</a>
+    </div>
+
+    <div id="formulario-crear" style="display: none;">
+        <h2>Crear nuevo usuario</h2>
+        <form id="crear-usuario-form">
+            <div class="row">
+                <div class="col">
+                    <label for="ID_CC">Cedula</label>
+                    <input type="text" class="form-control" id="ID_CC" required>
+                </div>
+                <div class="col">
+                    <label for="Usua_Nombre">Nombre</label>
+                    <input type="text" class="form-control" id="Usua_Nombre" required>
+                </div>
+                <div class="col">
+                    <label for="Usua_Apellido">Apellido</label>
+                    <input type="text" class="form-control" id="Usua_Apellido" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="Usua_Ciudad">Ciudad</label>
+                    <input type="text" class="form-control" id="Usua_Ciudad" required>
+                </div>
+                <div class="col">
+                    <label for="Usua_Telefono">Teléfono</label>
+                    <input type="text" class="form-control" id="Usua_Telefono" required>
+                </div>
+                <div class="col">
+                    <label for="Usua_Correo">Correo</label>
+                    <input type="text" class="form-control" id="Usua_Correo" required>
+                </div> 
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="Usua_Estado">Estado</label>
+                    <select  class="form-control" id="Usua_Estado" required>
+                        <option value="">Seleccione un estado</option>
+                        <option value ="Activo">Activo</option>
+                        <option value ="Desactivado">Desactivado</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="Usua_Area">Área</label>
+                    <select class="form-control" id="Usua_Area" required>
+                        <option value ="">Seleccione un área</option>
+                        <option value ="logistica">logistica</option>
+                        <option value ="compras">compras</option>
+                        <option value ="contabilidad">contabilidad</option>
+                        <option value ="proveedor">proveedor</option>
+                        <option value ="cliente">cliente</option>
+                        <option value ="admin">admin</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" class="form-control" id="contrasena" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-crear-usuario"><i class="bi bi-person-plus"></i> Crear usuario</button>
+            <a href="Usuarios.html" class="btn btn-volver"><i class="bi bi-arrow-left"></i>Volver</a>
+        </form>
+    </div>
+    
+    <div id="formulario-editar" style="display: none;">
+        <h2>Editar los usuarios</h2>
+        <form id="editar-usuario-form">
+            <div class="row">
+                <div class="col">
+                    <label for="editar-ID_CC">Cedula</label>
+                    <input type="text" class="form-control" id="editar-ID_CC" required>
+                </div>
+                <div class="col">
+                    <label for="editar-Usua_Nombre">Nombre</label>
+                    <input type="text" class="form-control" id="editar-Usua_Nombre" required>
+                </div>
+                <div class="col">
+                    <label for="editar-Usua_Apellido">Apellido</label>
+                    <input type="text" class="form-control" id="editar-Usua_Apellido" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar-Usua_Ciudad">Ciudad</label>
+                    <input type="text" class="form-control" id="editar-Usua_Ciudad" required>
+                </div>
+                <div class="col">
+                    <label for="editar-Usua_Telefono">Teléfono</label>
+                    <input type="text" class="form-control" id="editar-Usua_Telefono" required>
+                </div>
+                <div class="col">
+                    <label for="editar-Usua_Correo">Correo</label>
+                    <input type="text" class="form-control" id="editar-Usua_Correo" required>
+                </div> 
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="editar-Usua_Estado">Estado</label>
+                    <select  class="form-control" id="editar-Usua_Estado" required>
+                        <option value="">Seleccione un estado</option>
+                        <option value ="Activo">Activo</option>
+                        <option value ="Desactivado">Desactivado</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="editar-Usua_Area">Área</label>
+                    <select class="form-control" id="editar-Usua_Area" required>
+                        <option value ="">Seleccione un área</option>
+                        <option value ="logistica">logistica</option>
+                        <option value ="compras">compras</option>
+                        <option value ="contabilidad">contabilidad</option>
+                        <option value ="proveedor">proveedor</option>
+                        <option value ="cliente">cliente</option>
+                        <option value ="admin">admin</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="editar-contrasena">Contraseña</label>
+                    <input type="password" class="form-control" id="editar-contrasena">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-editar"><i class="bi bi-pencil"></i> Editar usuario</button>
+            <a href="Usuarios.html" class="btn btn-volver"><i class="bi bi-arrow-left"></i> Volver</a>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            function cargarUsuarios(){
+                fetch('http://127.0.0.1:5000/usuarios')
+                .then(response => response.json())
+                .then(data =>{
+                    const usuariosBody = document.getElementById('usuarios-body');
+                    usuariosBody.innerHTML='';
+                    data.forEach(usuario => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML= `
+                            <td>${usuario[0]}</td>
+                            <td>${usuario[1]}</td>
+                            <td>${usuario[2]}</td>
+                            <td>${usuario[3]}</td>
+                            <td>${usuario[4]}</td>
+                            <td>${usuario[5]}</td>
+                            <td>${usuario[6]}</td>
+                            <td>${usuario[7]}</td>
+                            <td>${usuario[8]}</td>
+                            <td>*********</td>
+                            <td><button class="btn btn-editar" onclick="editarUsuario(${usuario[0]})"><i class="bi bi-pencil"></i> Editar</button></td>
+                        `; 
+                        usuariosBody.appendChild(tr)
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            cargarUsuarios();
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+
+            const botonCrear = document.getElementById('btn-crear-usuario');
+            const formularioCrear = document.getElementById('formulario-crear');
+            const tablaUsuarios = document.getElementById('usuarios-table');
+            const tituloModulo = document.getElementById('titulo-modulo');
+            const botonVolverTabla = document.getElementById('btn-volver-tabla');
+
+            botonCrear.addEventListener('click', function(){
+                formularioCrear.style.display = 'block';
+                tablaUsuarios.style.display = 'none';
+                botonCrear.style.display = 'none';
+                tituloModulo.style.display = 'none';
+                botonVolverTabla.style.display = 'none';
+            });
+            document.getElementById('crear-usuario-form').addEventListener('submit', function(event){
+                event.preventDefault();
+                const ID_CC = document.getElementById('ID_CC').value;
+                const Usua_Nombre = document.getElementById('Usua_Nombre').value;
+                const Usua_Apellido = document.getElementById('Usua_Apellido').value;
+                const Usua_Ciudad = document.getElementById('Usua_Ciudad').value;
+                const Usua_Telefono = document.getElementById('Usua_Telefono').value;
+                const Usua_Correo  = document.getElementById('Usua_Correo').value;
+                const Usua_Estado = document.getElementById('Usua_Estado').value;
+                const Usua_Area = document.getElementById('Usua_Area').value;
+                const contrasena = document.getElementById('contrasena').value;
+    
+                fetch('http://127.0.0.1:5000/nuevo_usuario',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type': "application/json"
+                    },
+                    body:JSON.stringify({ID_CC: ID_CC, Usua_Nombre: Usua_Nombre, Usua_Apellido: Usua_Apellido, Usua_Ciudad: Usua_Ciudad, Usua_Telefono: Usua_Telefono, Usua_Correo: Usua_Correo, Usua_Estado: Usua_Estado, Usua_Area: Usua_Area, contrasena: contrasena})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Usuario creado',
+                        text:data.mensaje,
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        window.location.href = 'Usuarios.html';
+                    });
+                })
+                .catch(error => console.error ('Error:', error));
+            });
+        });
+    </script>
+
+    <script>
+        let idUsuarioActual = null;
+        function editarUsuario(id){
+            idUsuarioActual = id;
+
+            const botonCrear = document.getElementById('btn-crear-usuario');
+            const formularioEditar = document.getElementById('formulario-editar');
+            const tablaUsuarios = document.getElementById('usuarios-table');
+            const tituloModulo = document.getElementById('titulo-modulo');
+            const botonVolverTabla = document.getElementById('btn-volver-tabla');
+
+                formularioEditar.style.display = 'block';
+                tablaUsuarios.style.display = 'none';
+                botonCrear.style.display = 'none';
+                tituloModulo.style.display = 'none';
+                botonVolverTabla.style.display = 'none';
+
+            fetch(`http://127.0.0.1:5000/usuario/${id}`)
+            .then(response => response.json())
+            .then (data => {
+                document.getElementById('editar-ID_CC').value = data[1];
+                document.getElementById('editar-Usua_Nombre').value = data[2];
+                document.getElementById('editar-Usua_Apellido').value = data[3];
+                document.getElementById('editar-Usua_Ciudad').value = data[4];
+                document.getElementById('editar-Usua_Telefono').value = data[5];
+                document.getElementById('editar-Usua_Correo').value = data[6];
+                document.getElementById('editar-Usua_Estado').value = data[7];
+                document.getElementById('editar-Usua_Area').value = data[8];
+                document.getElementById('editar-contrasena').value = '';
+            })
+            .catch(error => console.error('Error:',error));
+        }
+        document.getElementById('editar-usuario-form').addEventListener('submit', function(event){
+            event.preventDefault();
+            const ID_CC = document.getElementById('editar-ID_CC').value;
+            const Usua_Nombre = document.getElementById('editar-Usua_Nombre').value;
+            const Usua_Apellido = document.getElementById('editar-Usua_Apellido').value;
+            const Usua_Ciudad = document.getElementById('editar-Usua_Ciudad').value;
+            const Usua_Telefono = document.getElementById('editar-Usua_Telefono').value;
+            const Usua_Correo = document.getElementById('editar-Usua_Correo').value;
+            const Usua_Estado = document.getElementById('editar-Usua_Estado').value;
+            const Usua_Area = document.getElementById('editar-Usua_Area').value;
+            const contrasena = document.getElementById('editar-contrasena').value;
+
+            fetch(`http://127.0.0.1:5000/actualizar_usuario/${idUsuarioActual}`,{
+                method:'PUT',
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ID_CC, Usua_Nombre, Usua_Apellido, Usua_Ciudad, Usua_Telefono, Usua_Correo, Usua_Estado, Usua_Area, contrasena})
+            })
+            .then(response => response.json())
+            .then(data =>{
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Usuario actualizado',
+                    text: data.mensaje,
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    window.location.href = 'Usuarios.html'
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

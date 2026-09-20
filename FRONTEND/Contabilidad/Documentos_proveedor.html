@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos del proveedor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script></head>
+<body>
+    <div class="contenedor mb-5">
+        <h1 class="text-center mb-4">Documentos del proveedor</h1>
+        <div class="tabla-contenedor">
+            <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Id documento</th>
+                        <th>Tipo de documento</th>
+                        <th>Nombre del archivo</th>
+                        <th>Fecha de subida</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaDocumentos"></tbody>
+            </table>
+        </div>
+        <a href="../index_contabilidad.html" class="btn btn-outline-primary">Volver</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            fetch('http://127.0.0.1:5000/documentos_proveedor')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const tabla = document.getElementById('tablaDocumentos');
+                data.forEach(documento => {
+                    const fila = document.createElement('tr');
+
+                    let botones = '';
+                    if(documento[5] === 'Pendiente'){
+                        botones = `
+                            <button class="btn btn-outline-primary" onclick="verDocumento(${documento[0]})">Ver documento</button>
+                            <button class="btn btn-outline-success" onclick="cambiarEstadoDocumento(${documento[0]}, 'Aprobado')">Aprobar</button>
+                            <button class="btn btn-outline-danger" onclick="cambiarEstadoDocumento(${documento[0]}, 'Rechazado')">Rechazar</button>
+                        `;
+                    }else{
+                        botones = `
+                            <button class="btn btn-outline-primary" onclick="verDocumento(${documento[0]})">Ver documento</button>
+                        `;
+                    }
+
+                    fila.innerHTML = `
+                        <td>${documento[0]}</td>
+                        <td>${documento[1]}</td>
+                        <td>${documento[2]}</td>
+                        <td>${new Date(documento[4]).toLocaleDateString()}</td>
+                        <td>${documento[5]}</td>
+                        <td>
+                            ${botones}
+                        </td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+        function verDocumento(id){
+            window.open(`http://127.0.0.1:5000/ver_documento/${id}`, '_blank');
+        }
+        function cambiarEstadoDocumento(id, estado){
+            fetch(`http://127.0.0.1:5000/actualizar_estado_documento/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({estado_validacion: estado})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if(data.mensaje){
+                    Swal.fire({
+                        title: "Estado actualizado",
+                        text: data.mensaje,
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    setTimeout(function(){
+                        location.reload();
+                    },   1500);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
